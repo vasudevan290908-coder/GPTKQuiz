@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Portal | Login</title>
+
+  <!-- Font Links (Arima - GPTK Quiz Design System) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Arima:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Arima"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            arima: ['"Arima"', 'cursive', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React 18 & Babel Standalone -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Google Identity Services (OAuth 2.0 / GIS) SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Arima:wght@400;500;600;700;800&display=swap');
+
+    *, *::before, *::after,
+    html, body,
+    input, button, select, textarea,
+    span, p, h1, h2, h3, h4, h5, h6, a, label, div,
+    input::placeholder, textarea::placeholder {
+      font-family: 'Arima', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Arima', cursive, sans-serif !important;
+      font-weight: 700 !important;
+    }
+
+    body {
+      background-color: #060B18;
+      color: #FFFFFF;
+      overflow-x: hidden;
+    }
+
+    @keyframes gridDrift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
+    }
+    .motion-grid {
+      background-image:
+        linear-gradient(to right,  rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridDrift 20s linear infinite;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0)    scale(1); }
+      50%       { transform: translateY(-18px) scale(1.04); }
+    }
+    .orb-a { animation: floatSlow 8s  ease-in-out infinite; }
+    .orb-b { animation: floatSlow 12s ease-in-out infinite reverse; }
+    .orb-c { animation: floatSlow 10s ease-in-out infinite 3s; }
+
+    @keyframes fadeInSlide {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fadeIn {
+      animation: fadeInSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .animate-slide-right {
+      animation: slideInRight 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    .animate-slide-left {
+      animation: slideInLeft 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Florin Pop Double-Slider Animation System (Exact match with C:/qwe/GPTK-QUIZ) */
+    .slider-main-container {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 1024px;
+      min-height: 620px;
+      border-radius: 28px;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 0 35px rgba(56, 189, 248, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .form-container {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sign-in-container, .sign-up-container, .overlay-container, .overlay, .overlay-panel {
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .sign-in-container {
+      left: 0;
+      width: 50%;
+      z-index: 2;
+      opacity: 1;
+      pointer-events: auto;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slider-main-container.right-panel-active .sign-in-container {
+      transform: translate3d(100%, 0, 0);
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .sign-up-container {
+      left: 0;
+      width: 50%;
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slider-main-container.right-panel-active .sign-up-container {
+      transform: translate3d(100%, 0, 0);
+      opacity: 1;
+      z-index: 5;
+      pointer-events: auto;
+      animation: showOverlay 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes showOverlay {
+      0%, 49.99% {
+        opacity: 0;
+        z-index: 1;
+      }
+      50%, 100% {
+        opacity: 1;
+        z-index: 5;
+      }
+    }
+
+    /* Overlay Container (Sliding gradient / glass panel) */
+    .overlay-container {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 100;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .slider-main-container.right-panel-active .overlay-container {
+      transform: translate3d(-100%, 0, 0);
+      border-left: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .overlay {
+      background: rgba(17, 24, 54, 0.85);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      color: #ffffff;
+      position: relative;
+      left: -100%;
+      height: 100%;
+      width: 200%;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slider-main-container.right-panel-active .overlay {
+      transform: translate3d(50%, 0, 0);
+    }
+
+    .overlay-panel {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 0;
+      text-align: center;
+      top: 0;
+      height: 100%;
+      width: 50%;
+      transform: translate3d(0, 0, 0);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .overlay-left {
+      transform: translateX(-20%);
+    }
+
+    .slider-main-container.right-panel-active .overlay-left {
+      transform: translateX(0);
+    }
+
+    .overlay-right {
+      right: 0;
+      transform: translateX(0);
+    }
+
+    .slider-main-container.right-panel-active .overlay-right {
+      transform: translateX(20%);
+    }
+
+    /* Tactile Interactive Button Hover System */
+    button {
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0px) scale(0.98) !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen relative selection:bg-white selection:text-black">
+
+  <!-- Grid Background -->
+  <div class="fixed inset-0 motion-grid pointer-events-none z-0"></div>
+
+  <!-- Ambient Orbs — luminous glow for glass refraction -->
+  <div class="fixed top-1/4 left-10 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none orb-a z-0"></div>
+  <div class="fixed bottom-1/4 right-10 w-[420px] h-[420px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none orb-b z-0"></div>
+  <div class="fixed top-10 right-1/3 w-72 h-72 bg-sky-500/15 rounded-full blur-[90px] pointer-events-none orb-c z-0"></div>
+
+  <!-- React Root -->
+  <div id="root" class="relative z-10"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Decodes the Google Identity Services JWT credential payload
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const GoogleButton = ({ label, onClick }) => (
+      <button
+        type="button"
+        onClick={onClick}
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1)'
+        }}
+        className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-white/10 rounded-full font-semibold text-sm text-white transition-all duration-200 hover:bg-white/15 hover:border-white/30 hover:shadow-[0_8px_22px_rgba(0,0,0,0.35),0_0_15px_rgba(255,255,255,0.1)] active:scale-[0.98]"
+      >
+        <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+        </svg>
+        <span>{label}</span>
+      </button>
+    );
+
+    /* ════════════════════════════════════════
+       Authentic Google OAuth 2-Step Authentication Modal
+       (Matching user uploaded Image 1 & Image 2 + Live GIS)
+    ════════════════════════════════════════ */
+    const GoogleAuthModal = ({ isOpen, onClose, role, onAuthSuccess }) => {
+      // step: 1 = 'choose-account', 2 = 'confirm-consent', 3 = 'redirecting'
+      const [step, setStep]                     = useState(1);
+      const [selectedAccount, setSelectedAccount] = useState(null);
+      const [customMode, setCustomMode]         = useState(false);
+      const [customName, setCustomName]         = useState('');
+      const [customEmail, setCustomEmail]       = useState('');
+
+      React.useEffect(() => {
+        if (isOpen) {
+          setStep(1);
+          setSelectedAccount(null);
+          setCustomMode(false);
+        }
+      }, [isOpen]);
+
+      if (!isOpen) return null;
+
+      const accounts = [
+        { name: 'Vasudevan', email: 'vsvasudevanvasu02@gmail.com', initial: 'V', color: 'bg-[#8E24AA]' },
+        { name: 'Vasudevan', email: 'vasudevanvasuvs02@gmail.com', initial: 'V', color: 'bg-[#9C27B0]' }
+      ];
+
+      const handleAccountClick = (acc) => {
+        setSelectedAccount(acc);
+        setStep(2); // Go to Step 2: Consent / Permission screen (Image 2)
+      };
+
+      const handleCustomSubmit = (e) => {
+        e.preventDefault();
+        if (!customName.trim() || !customEmail.trim()) return;
+        const acc = {
+          name: customName.trim(),
+          email: customEmail.trim(),
+          initial: customName.trim().charAt(0).toUpperCase(),
+          color: 'bg-[#8E24AA]'
+        };
+        setSelectedAccount(acc);
+        setStep(2);
+      };
+
+      const handleConfirmContinue = () => {
+        setStep(3); // Loading / Redirecting
+        setTimeout(() => {
+          onAuthSuccess({
+            name: selectedAccount.name,
+            email: selectedAccount.email,
+            role: role
+          });
+        }, 700);
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn">
+          {/* Main Google Dark Window */}
+          <div 
+            style={{
+              background: '#131314',
+              borderRadius: '28px',
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(255, 255, 255, 0.1)'
+            }}
+            className="w-full max-w-2xl text-white relative overflow-hidden flex flex-col justify-between min-h-[480px] p-6 sm:p-10 border border-[#303134]"
+          >
+
+            {/* Top Bar: Google Logo + Sign in with Google */}
+            <div className="flex items-center justify-between pb-6 border-b border-[#282a2d]">
+              <div className="flex items-center gap-2.5">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                </svg>
+                <span className="text-sm font-medium text-[#e3e3e3]">Sign in with Google</span>
+              </div>
+
+              <button 
+                type="button" 
+                onClick={onClose}
+                className="text-[#9aa0a6] hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
+                title="Close"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* STEP 1: CHOOSE AN ACCOUNT (Exact Image 1 layout) */}
+            {step === 1 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6 flex-1 items-start">
+                {/* Left Column: App icon & Title */}
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center shadow-md">
+                    <svg className="w-7 h-7 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl sm:text-4xl font-normal text-[#e3e3e3] leading-tight">
+                      Choose an account
+                    </h2>
+                    <p className="text-base text-[#c4c7c5] mt-2">
+                      to continue to <span className="text-white font-medium">University Portal</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Column: Account list */}
+                <div className="space-y-1">
+                  {customMode ? (
+                    <form onSubmit={handleCustomSubmit} className="space-y-3 p-3 bg-[#1e1f20] rounded-xl border border-[#3c4043]">
+                      <div className="text-xs font-semibold text-sky-400 uppercase tracking-wide">Enter Google Account</div>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Full Name (e.g. Vasudevan)"
+                        value={customName}
+                        onChange={(e) => setCustomName(e.target.value)}
+                        className="w-full py-2.5 px-3 bg-[#131314] border border-[#5f6368] rounded-lg text-sm text-white focus:outline-none focus:border-sky-400"
+                      />
+                      <input
+                        type="email"
+                        required
+                        placeholder="Google Email (e.g. user@gmail.com)"
+                        value={customEmail}
+                        onChange={(e) => setCustomEmail(e.target.value)}
+                        className="w-full py-2.5 px-3 bg-[#131314] border border-[#5f6368] rounded-lg text-sm text-white focus:outline-none focus:border-sky-400"
+                      />
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setCustomMode(false)}
+                          className="w-1/2 py-2 rounded-full border border-[#5f6368] text-xs text-white hover:bg-white/5"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="w-1/2 py-2 rounded-full bg-white text-black font-semibold text-xs hover:bg-[#e3e3e3]"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      {accounts.map((acc, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => handleAccountClick(acc)}
+                          className="w-full flex items-center gap-3.5 py-3.5 px-3 rounded-lg hover:bg-[#1e1f20] transition-colors text-left border-b border-[#282a2d] last:border-none"
+                        >
+                          <div className={`w-8 h-8 rounded-full ${acc.color} text-white font-medium text-sm flex items-center justify-center flex-shrink-0`}>
+                            {acc.initial}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-[#e3e3e3] leading-tight truncate">
+                              {acc.name}
+                            </div>
+                            <div className="text-xs text-[#9aa0a6] truncate mt-0.5">
+                              {acc.email}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+
+                      {/* Use another account */}
+                      <button
+                        type="button"
+                        onClick={() => setCustomMode(true)}
+                        className="w-full flex items-center gap-3.5 py-3.5 px-3 rounded-lg hover:bg-[#1e1f20] transition-colors text-left text-[#e3e3e3]"
+                      >
+                        <div className="w-8 h-8 rounded-full border border-[#5f6368] flex items-center justify-center flex-shrink-0 text-[#9aa0a6]">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-medium">Use another account</span>
+                      </button>
+                    </>
+                  )}
+
+                  <p className="pt-4 text-xs text-[#9aa0a6] leading-relaxed">
+                    Before using this app, you can review University Portal's <a href="#" className="text-sky-400 hover:underline">Privacy Policy</a> and <a href="#" className="text-sky-400 hover:underline">Terms of Service</a>.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: CONFIRM & AUTHORIZE ACCESS (Exact Image 2 layout) */}
+            {step === 2 && selectedAccount && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6 flex-1 items-start animate-fadeIn">
+                {/* Left Column: App Title & Selected Account Pill */}
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center shadow-md">
+                    <svg className="w-7 h-7 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl sm:text-4xl font-normal text-[#e3e3e3] leading-tight">
+                      Sign in to University Portal
+                    </h2>
+                    {/* Selected Account Pill */}
+                    <div className="inline-flex items-center gap-2 mt-4 px-3 py-1.5 rounded-full border border-[#3c4043] bg-[#1e1f20] text-xs text-[#e3e3e3]">
+                      <div className={`w-5 h-5 rounded-full ${selectedAccount.color} text-[11px] font-bold flex items-center justify-center`}>
+                        {selectedAccount.initial}
+                      </div>
+                      <span className="truncate max-w-[180px]">{selectedAccount.email}</span>
+                      <svg className="w-3.5 h-3.5 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Scopes / Permissions list */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-normal text-[#e3e3e3]">
+                    Google will allow University Portal to access this info about you
+                  </h3>
+
+                  {/* Scope 1: Name and profile picture */}
+                  <div className="flex items-start gap-3 pt-2">
+                    <div className="text-[#9aa0a6] mt-0.5">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-[#e3e3e3]">{selectedAccount.name}</div>
+                      <div className="text-xs text-[#9aa0a6]">Name and profile picture</div>
+                    </div>
+                  </div>
+
+                  {/* Scope 2: Email address */}
+                  <div className="flex items-start gap-3">
+                    <div className="text-[#9aa0a6] mt-0.5">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-[#e3e3e3]">{selectedAccount.email}</div>
+                      <div className="text-xs text-[#9aa0a6]">Email address</div>
+                    </div>
+                  </div>
+
+                  {/* Disclaimer */}
+                  <p className="text-xs text-[#9aa0a6] leading-relaxed pt-2">
+                    Review University Portal's <a href="#" className="text-sky-400 hover:underline">privacy policy</a> and <a href="#" className="text-sky-400 hover:underline">Terms of Service</a> to understand how University Portal will process and protect your data.
+                  </p>
+                  <p className="text-xs text-[#9aa0a6]">
+                    To make changes at any time, go to your <a href="#" className="text-sky-400 hover:underline">Google Account</a>.
+                  </p>
+                  <p className="text-xs text-[#9aa0a6]">
+                    Learn more about <a href="#" className="text-sky-400 hover:underline">Sign in with Google</a>.
+                  </p>
+
+                  {/* Buttons: Cancel & Continue (Exact Image 2 pills) */}
+                  <div className="flex items-center justify-end gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="px-6 py-2.5 rounded-full border border-[#5f6368] text-sm font-medium text-[#e3e3e3] hover:bg-white/5 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmContinue}
+                      className="px-6 py-2.5 rounded-full bg-white hover:bg-[#e3e3e3] text-black font-semibold text-sm transition-all shadow-md active:scale-95"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: REDIRECTING SPINNER */}
+            {step === 3 && (
+              <div className="py-20 text-center space-y-4 flex-1 flex flex-col items-center justify-center">
+                <div className="w-12 h-12 border-3 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-base font-medium text-[#e3e3e3]">
+                  Redirecting to University Portal...
+                </p>
+                <p className="text-xs text-[#9aa0a6]">
+                  Setting up profile info for {selectedAccount?.name}
+                </p>
+              </div>
+            )}
+
+            {/* Bottom Bar: Language & Links */}
+            <div className="flex items-center justify-between pt-6 border-t border-[#282a2d] text-xs text-[#9aa0a6]">
+              <div className="flex items-center gap-1 cursor-pointer hover:text-white">
+                <span>English (United Kingdom)</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-6">
+                <a href="#" className="hover:text-white transition-colors">Help</a>
+                <a href="#" className="hover:text-white transition-colors">Privacy</a>
+                <a href="#" className="hover:text-white transition-colors">Terms</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const InputField = ({ id, type = 'text', placeholder, value, onChange }) => {
+      const [show, setShow] = useState(false);
+      const isPass = type === 'password';
+      const inputType = isPass ? (show ? 'text' : 'password') : type;
+
+      return (
+        <div className="relative">
+          <input
+            id={id}
+            type={inputType}
+            required
+            placeholder={placeholder}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full py-3.5 px-4 pr-11 bg-white/[0.05] border border-white/15 rounded-[10px] font-medium text-sm text-white placeholder-slate-400/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.35),0_1px_1px_rgba(255,255,255,0.08)] transition-all duration-200 hover:bg-white/[0.08] hover:border-white/25 focus:outline-none focus:border-sky-400/60 focus:bg-white/[0.09] focus:shadow-[0_0_16px_rgba(56,189,248,0.25),inset_0_2px_4px_rgba(0,0,0,0.25)]"
+          />
+          {isPass && (
+            <button
+              type="button"
+              onClick={() => setShow(!show)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-sky-300 hover:scale-110 transition-all duration-150 active:scale-90"
+            >
+              {show ? (
+                // Unblocked / Visible: Open Eye icon
+                <svg className="w-5 h-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              ) : (
+                // Blocked / Hidden: Eye with diagonal slash
+                <svg className="w-5 h-5 text-gray-400 hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              )}
+            </button>
+          )}
+        </div>
+      );
+    };
+
+    /* Floating Outlined Input Field (Matching user Image 3 style) */
+    const OutlinedField = ({ id, label, type = 'text', placeholder, value, onChange }) => {
+      const [show, setShow] = useState(false);
+      const [focused, setFocused] = useState(false);
+      const isPass = type === 'password';
+      const inputType = isPass ? (show ? 'text' : 'password') : type;
+
+      return (
+        <div className="relative">
+          <fieldset className={`border rounded-[14px] px-3.5 pt-1.5 pb-2.5 transition-all duration-200 ${focused ? 'border-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.25)]' : 'border-white/20 hover:border-white/35'} bg-white/[0.02]`}>
+            <legend className={`text-[11px] font-medium px-1.5 transition-colors duration-200 ${focused ? 'text-sky-400' : 'text-slate-300'}`}>
+              {label}
+            </legend>
+            <div className="flex items-center">
+              <input
+                id={id}
+                type={inputType}
+                required
+                placeholder={placeholder || ''}
+                value={value}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full bg-transparent text-white font-medium text-sm outline-none placeholder-slate-500/50"
+              />
+              {isPass && (
+                <button
+                  type="button"
+                  onClick={() => setShow(!show)}
+                  className="p-1 text-gray-400 hover:text-sky-300 transition-colors flex-shrink-0"
+                >
+                  {show ? (
+                    <svg className="w-5 h-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-gray-400 hover:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  )}
+                </button>
+              )}
+            </div>
+          </fieldset>
+        </div>
+      );
+    };
+
+    const StudentLogin = ({ onSwitchToRegister, onGoogleAuth, registeredIdentifier, loginNotification }) => {
+      const [identifier, setIdentifier] = useState('');
+      const [password, setPassword]     = useState('');
+      const [loginStatus, setLoginStatus] = useState(null); // { type: 'success' | 'error', text: '' }
+
+      // Auto fill registered identifier if just registered
+      React.useEffect(() => {
+        if (registeredIdentifier) {
+          setIdentifier(registeredIdentifier);
+        }
+      }, [registeredIdentifier]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const idTrim = identifier.trim();
+        const passTrim = password.trim();
+
+        // 1. Check local storage registered users
+        let users = [];
+        try {
+          users = JSON.parse(localStorage.getItem('portal_registered_users') || '[]');
+        } catch (err) {
+          users = [];
+        }
+
+        const foundUser = users.find(u => 
+          (u.rollNo && u.rollNo.toLowerCase() === idTrim.toLowerCase()) ||
+          (u.email && u.email.toLowerCase() === idTrim.toLowerCase()) ||
+          (u.name && u.name.toLowerCase() === idTrim.toLowerCase())
+        );
+
+        if (foundUser) {
+          if (foundUser.password === passTrim) {
+            setLoginStatus({ type: 'success', text: `Welcome back, ${foundUser.name}! Logging you into the exam session...` });
+            return;
+          } else {
+            setLoginStatus({ type: 'error', text: 'Incorrect password for this Register No. Please try again.' });
+            return;
+          }
+        }
+
+        // 2. Demo fallback test credentials
+        if ((idTrim.toLowerCase() === 'student' || idTrim.toLowerCase() === '2026cs101') && passTrim === 'student123') {
+          setLoginStatus({ type: 'success', text: 'Welcome, Demo Student! Access granted.' });
+          return;
+        }
+
+        setLoginStatus({ type: 'error', text: 'Register No. or Password not recognized. If new, sign up first.' });
+      };
+
+      return (
+        <section className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full w-full flex-1">
+          <div>
+            <div className="text-center mb-6">
+              {/* Centered User Avatar Badge — Transparent Frosted Glass */}
+              <div 
+                className="w-12 h-12 rounded-[14px] border border-sky-400/40 flex items-center justify-center mx-auto mb-3"
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  boxShadow: '0 0 25px rgba(56, 189, 248, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <svg className="w-6 h-6 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+
+              {/* Title & Subtitle */}
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">Student Sign In</h2>
+              <p className="text-xs sm:text-sm text-slate-300 font-normal mt-1.5 tracking-normal">Access your proctored examination</p>
+            </div>
+
+            {/* Notification if redirected from registration */}
+            {loginNotification && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-500/15 border border-emerald-400/40 text-xs text-emerald-300 flex items-center gap-2 animate-fadeIn">
+                <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{loginNotification}</span>
+              </div>
+            )}
+
+            {/* Login feedback status */}
+            {loginStatus && (
+              <div className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 animate-fadeIn ${
+                loginStatus.type === 'success' 
+                  ? 'bg-emerald-500/20 border border-emerald-400/40 text-emerald-300' 
+                  : 'bg-rose-500/20 border border-rose-400/40 text-rose-300'
+              }`}>
+                {loginStatus.type === 'success' ? (
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                )}
+                <span>{loginStatus.text}</span>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <InputField id="s-id"   type="text"     placeholder="Register No. / Student Roll ID" value={identifier} onChange={(v) => { setIdentifier(v); setLoginStatus(null); }} />
+              <InputField id="s-pass" type="password" placeholder="Password"                    value={password}   onChange={(v) => { setPassword(v); setLoginStatus(null); }} />
+
+              <button
+                type="submit"
+                style={{
+                  boxShadow: '0 10px 30px -5px rgba(139, 92, 246, 0.55), 0 0 20px rgba(236, 72, 153, 0.2)'
+                }}
+                className="w-full mt-3 py-3.5 px-5 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 hover:from-violet-400 hover:via-purple-400 hover:to-pink-400 hover:shadow-[0_16px_36px_-4px_rgba(139,92,246,0.75),0_0_25px_rgba(236,72,153,0.35)] text-white font-bold text-sm rounded-full transition-all duration-200 active:scale-[0.98]"
+              >
+                Sign In to Exam
+              </button>
+            </form>
+
+            {/* Divider — or continue with */}
+            <div className="relative flex items-center justify-center my-5">
+              <div className="w-full border-t border-white/10"></div>
+              <span className="absolute bg-slate-900/70 backdrop-blur-md px-3 text-xs font-medium text-slate-300">
+                or continue with
+              </span>
+            </div>
+
+            {/* Google SSO */}
+            <GoogleButton label="Continue with Google" onClick={() => onGoogleAuth && onGoogleAuth('student')} />
+
+            {/* Sign Up Section — positioned slightly lower */}
+            <div className="relative flex items-center justify-center mt-9 mb-4">
+              <div className="w-full border-t border-white/10"></div>
+              <span className="absolute bg-slate-900/80 backdrop-blur-md px-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                — NEW STUDENT? —
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={onSwitchToRegister}
+              style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.08)'
+              }}
+              className="w-full py-3.5 px-4 rounded-full border border-white/15 text-white font-bold text-sm transition-all duration-200 hover:bg-white/15 hover:border-white/35 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35),0_0_15px_rgba(255,255,255,0.12)] active:scale-[0.98]"
+            >
+              Sign Up New Student
+            </button>
+          </div>
+        </section>
+      );
+    };
+
+    const LecturerLogin = ({ onSwitchToTeacherRegister, onGoogleAuth, registeredIdentifier, loginNotification }) => {
+      const [username, setUsername] = useState('');
+      const [password, setPassword] = useState('');
+      const [loginStatus, setLoginStatus] = useState(null);
+
+      React.useEffect(() => {
+        if (registeredIdentifier) {
+          setUsername(registeredIdentifier);
+        }
+      }, [registeredIdentifier]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const u = username.trim().toLowerCase();
+        const p = password.trim();
+
+        // 1. Check local storage
+        let teachers = [];
+        try {
+          teachers = JSON.parse(localStorage.getItem('portal_registered_teachers') || '[]');
+        } catch (e) {
+          teachers = [];
+        }
+
+        const found = teachers.find(t => 
+          (t.email && t.email.toLowerCase() === u) ||
+          (t.name && t.name.toLowerCase() === u)
+        );
+
+        if (found) {
+          if (found.password === p) {
+            setLoginStatus({ type: 'success', text: `Welcome, ${found.name}! Accessing faculty dashboard...` });
+            return;
+          } else {
+            setLoginStatus({ type: 'error', text: 'Invalid password. Please try again.' });
+            return;
+          }
+        }
+
+        if ((u === 'admin' || u === 'admin@faculty.edu') && p === 'CSE@2026') {
+          setLoginStatus({ type: 'success', text: 'Welcome, Administrator! Access granted.' });
+        } else {
+          setLoginStatus({ type: 'error', text: 'Invalid credentials. Please try again.' });
+        }
+      };
+
+      return (
+        <section className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full w-full flex-1">
+          <div>
+            <div className="text-center mb-6">
+              {/* Faculty Icon Badge — Transparent Frosted Glass */}
+              <div 
+                className="w-12 h-12 rounded-[14px] border border-violet-400/40 flex items-center justify-center mx-auto mb-3"
+                style={{
+                  background: 'rgba(168, 85, 247, 0.12)',
+                  boxShadow: '0 0 25px rgba(168, 85, 247, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <svg className="w-6 h-6 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/>
+                </svg>
+              </div>
+
+              {/* Title & Subtitle */}
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">Teacher Portal</h2>
+              <p className="text-xs sm:text-sm text-slate-300 font-normal mt-1.5 tracking-normal">Faculty &amp; Course Supervisors</p>
+            </div>
+
+            {loginNotification && (
+              <div className="mb-4 p-3 rounded-xl bg-purple-500/20 border border-purple-400/40 text-xs text-purple-300 flex items-center gap-2 animate-fadeIn">
+                <svg className="w-4 h-4 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{loginNotification}</span>
+              </div>
+            )}
+
+            {loginStatus && (
+              <div className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 animate-fadeIn ${
+                loginStatus.type === 'success' 
+                  ? 'bg-emerald-500/20 border border-emerald-400/40 text-emerald-300' 
+                  : 'bg-rose-500/20 border border-rose-400/40 text-rose-300'
+              }`}>
+                <span>{loginStatus.text}</span>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <InputField id="l-user" type="text"     placeholder="Teacher Username / Faculty Email" value={username} onChange={(v) => { setUsername(v); setLoginStatus(null); }} />
+              <InputField id="l-pass" type="password" placeholder="Password"                         value={password} onChange={(v) => { setPassword(v); setLoginStatus(null); }} />
+
+              <button
+                type="submit"
+                style={{
+                  boxShadow: '0 10px 30px -5px rgba(139, 92, 246, 0.55), 0 0 20px rgba(236, 72, 153, 0.2)'
+                }}
+                className="w-full mt-3 py-3.5 px-5 bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 hover:from-violet-400 hover:via-purple-400 hover:to-pink-400 hover:shadow-[0_16px_36px_-4px_rgba(139,92,246,0.75),0_0_25px_rgba(236,72,153,0.35)] text-white font-bold text-sm rounded-full transition-all duration-200 active:scale-[0.98]"
+              >
+                Teacher Login
+              </button>
+            </form>
+
+            {/* Divider — or continue with */}
+            <div className="relative flex items-center justify-center my-5">
+              <div className="w-full border-t border-white/10"></div>
+              <span className="absolute bg-slate-900/70 backdrop-blur-md px-3 text-xs font-medium text-slate-300">
+                or continue with
+              </span>
+            </div>
+
+            {/* Google SSO */}
+            <GoogleButton label="Continue with Faculty Google" onClick={() => onGoogleAuth && onGoogleAuth('teacher')} />
+
+            {/* Divider — New Teacher? */}
+            <div className="relative flex items-center justify-center mt-9 mb-4">
+              <div className="w-full border-t border-white/10"></div>
+              <span className="absolute bg-[#111836]/80 backdrop-blur-md px-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                — NEW TEACHER? —
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onSwitchToTeacherRegister && onSwitchToTeacherRegister()}
+              style={{
+                background: 'rgba(168, 85, 247, 0.05)',
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(168, 85, 247, 0.08)'
+              }}
+              className="w-full py-3.5 px-4 rounded-full border border-violet-400/20 text-white font-bold text-sm transition-all duration-200 hover:bg-violet-500/10 hover:border-violet-400/40 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35),0_0_15px_rgba(168,85,247,0.15)] active:scale-[0.98]"
+            >
+              Sign Up as Teacher
+            </button>
+          </div>
+        </section>
+      );
+    };
+
+    /* ════════════════════════════════════════
+       Component: Welcome Back (Left Column in Register Mode)
+    ════════════════════════════════════════ */
+    const WelcomeBack = ({ onReturnToLogin }) => (
+      <section className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center items-center text-center h-full w-full flex-1">
+        <div className="max-w-sm space-y-5">
+          {/* Clickable Badge Icon → Return to Login */}
+          <button
+            type="button"
+            onClick={onReturnToLogin}
+            className="w-14 h-14 rounded-[14px] border border-sky-400/40 flex items-center justify-center mx-auto transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: 'rgba(56, 189, 248, 0.12)',
+              boxShadow: '0 0 25px rgba(56, 189, 248, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <svg className="w-7 h-7 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+            Welcome Back!
+          </h2>
+          <p className="text-sm text-slate-300 font-normal leading-relaxed px-2">
+            Already registered your student account? Sign in with your roll number and password to start.
+          </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={onReturnToLogin}
+              style={{
+                boxShadow: '0 10px 25px -5px rgba(56, 189, 248, 0.4), 0 0 20px rgba(56, 189, 248, 0.15)'
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 hover:shadow-[0_16px_36px_-4px_rgba(56,189,248,0.7),0_0_25px_rgba(56,189,248,0.35)] border border-sky-400/30 rounded-full text-white font-bold text-sm transition-all duration-200 active:scale-[0.98]"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Return to Login</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+
+    /* ════════════════════════════════════════
+       Component: Student Register (Right Column in Register Mode)
+       Matching Image 3: Floating Outlined Inputs & Continue Button
+    ════════════════════════════════════════ */
+    const StudentRegister = ({ onRegisterSuccess, onGoogleAuth, prefillData }) => {
+      const [fullName, setFullName]       = useState(prefillData?.name || '');
+      const [rollNo, setRollNo]           = useState('');
+      const [password, setPassword]       = useState('');
+      const [regError, setRegError]       = useState('');
+
+      // Auto-populate when prefillData updates
+      React.useEffect(() => {
+        if (prefillData) {
+          if (prefillData.name) setFullName(prefillData.name);
+        }
+      }, [prefillData]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const fName = fullName.trim();
+        const rNo = rollNo.trim();
+        const pass = password.trim();
+
+        if (!fName || !rNo || !pass) {
+          setRegError('Please fill in all required fields.');
+          return;
+        }
+
+        // Save into localStorage
+        let existingUsers = [];
+        try {
+          existingUsers = JSON.parse(localStorage.getItem('portal_registered_users') || '[]');
+        } catch (err) {
+          existingUsers = [];
+        }
+
+        // Filter out if duplicate rollNo exists
+        existingUsers = existingUsers.filter(u => u.rollNo.toLowerCase() !== rNo.toLowerCase());
+        const newUser = {
+          name: fName,
+          rollNo: rNo,
+          email: prefillData?.email || '',
+          password: pass,
+          registeredAt: new Date().toISOString()
+        };
+        existingUsers.push(newUser);
+        localStorage.setItem('portal_registered_users', JSON.stringify(existingUsers));
+
+        if (onRegisterSuccess) {
+          onRegisterSuccess({
+            identifier: rNo,
+            message: `Account created for ${fName}! Please enter your password to sign in.`
+          });
+        }
+      };
+
+      return (
+        <section className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full w-full flex-1">
+          <div>
+            <div className="text-center mb-6">
+              {/* Centered User Avatar Badge */}
+              <div 
+                className="w-12 h-12 rounded-[14px] border border-sky-400/40 flex items-center justify-center mx-auto mb-3"
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  boxShadow: '0 0 25px rgba(56, 189, 248, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <svg className="w-6 h-6 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+
+              {/* Title & Subtitle */}
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+                Create Account
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 font-normal mt-1.5 tracking-normal">
+                Register your student examination profile
+              </p>
+            </div>
+
+            {/* Google Verified Banner if prefilled */}
+            {prefillData && (
+              <div className="mb-4 p-3 rounded-xl bg-emerald-500/15 border border-emerald-400/30 flex items-center gap-2.5 text-xs text-emerald-300 animate-fadeIn">
+                <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Google connected ({prefillData.email}). Enter your Register No. &amp; Password.</span>
+              </div>
+            )}
+
+            {regError && (
+              <div className="mb-3 p-2.5 rounded-lg bg-rose-500/20 border border-rose-400/40 text-xs text-rose-300">
+                {regError}
+              </div>
+            )}
+
+            {/* Registration Form with Floating Outlined Inputs (Image 3) */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <OutlinedField
+                id="reg-name"
+                label="Full name"
+                type="text"
+                placeholder="e.g. Vasudevan"
+                value={fullName}
+                onChange={(v) => { setFullName(v); setRegError(''); }}
+              />
+
+              <OutlinedField
+                id="reg-roll"
+                label="Register No. / Student Roll ID"
+                type="text"
+                placeholder="e.g. 2026CS101"
+                value={rollNo}
+                onChange={(v) => { setRollNo(v); setRegError(''); }}
+              />
+
+              <OutlinedField
+                id="reg-pass"
+                label="Create Password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(v) => { setPassword(v); setRegError(''); }}
+              />
+
+              {/* Terms & Privacy Disclaimer (Image 3) */}
+              <p className="text-[11px] text-slate-400 leading-relaxed text-center px-1 pt-1">
+                By clicking &quot;Continue&quot;, you agree to our <a href="#" className="text-sky-400 hover:underline">Terms</a> and have read our <a href="#" className="text-sky-400 hover:underline">Privacy Policy</a>.
+              </p>
+
+              {/* Solid White Pill Continue Button (Image 3) */}
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-full bg-white hover:bg-slate-200 text-black font-semibold text-sm transition-all duration-200 shadow-[0_6px_25px_rgba(255,255,255,0.25)] active:scale-[0.98]"
+              >
+                Continue
+              </button>
+            </form>
+
+            {/* Minimalist Divider */}
+            <div className="relative flex items-center justify-center my-5">
+              <div className="w-full border-t border-white/10"></div>
+              <span className="absolute bg-[#111836]/80 backdrop-blur-md px-3 text-xs font-medium text-slate-300">
+                or register with
+              </span>
+            </div>
+
+            {/* Google SSO */}
+            <GoogleButton label="Sign up with Google" onClick={() => onGoogleAuth && onGoogleAuth('student')} />
+          </div>
+        </section>
+      );
+    };
+
+    /* ════════════════════════════════════════
+       Component: Teacher Register
+    ════════════════════════════════════════ */
+    const TeacherRegister = ({ onRegisterSuccess, onGoogleAuth, prefillData }) => {
+      const [fullName, setFullName]         = useState(prefillData?.name || '');
+      const [email, setEmail]               = useState(prefillData?.email || '');
+      const [department, setDepartment]     = useState('');
+      const [password, setPassword]         = useState('');
+      const [tRegError, setTRegError]       = useState('');
+
+      // Auto-populate when prefillData updates
+      React.useEffect(() => {
+        if (prefillData) {
+          if (prefillData.name) setFullName(prefillData.name);
+          if (prefillData.email) setEmail(prefillData.email);
+        }
+      }, [prefillData]);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const fName = fullName.trim();
+        const em = email.trim();
+        const pass = password.trim();
+
+        if (!fName || !em || !pass) {
+          setTRegError('Please complete all fields.');
+          return;
+        }
+
+        let existingTeachers = [];
+        try {
+          existingTeachers = JSON.parse(localStorage.getItem('portal_registered_teachers') || '[]');
+        } catch (e) {
+          existingTeachers = [];
+        }
+
+        existingTeachers = existingTeachers.filter(t => t.email.toLowerCase() !== em.toLowerCase());
+        const newTeacher = {
+          name: fName,
+          email: em,
+          department: department.trim(),
+          password: pass,
+          registeredAt: new Date().toISOString()
+        };
+        existingTeachers.push(newTeacher);
+        localStorage.setItem('portal_registered_teachers', JSON.stringify(existingTeachers));
+
+        if (onRegisterSuccess) {
+          onRegisterSuccess({
+            identifier: em,
+            message: `Faculty account created for ${fName}! Please sign in.`
+          });
+        }
+      };
+
+      return (
+        <section className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full w-full flex-1">
+          <div>
+            <div className="text-center mb-6">
+              {/* Faculty Register Badge */}
+              <div 
+                className="w-12 h-12 rounded-[14px] border border-violet-400/40 flex items-center justify-center mx-auto mb-3"
+                style={{
+                  background: 'rgba(168, 85, 247, 0.12)',
+                  boxShadow: '0 0 25px rgba(168, 85, 247, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <svg className="w-6 h-6 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/>
+                  <path d="M12 2v4M4 6h16"/>
+                </svg>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">Faculty Register</h2>
+              <p className="text-xs sm:text-sm text-slate-300 font-normal mt-1.5 tracking-normal">Create your faculty account</p>
+            </div>
+
+            {/* Google Verified Banner if prefilled */}
+            {prefillData && (
+              <div className="mb-4 p-3 rounded-xl bg-purple-500/15 border border-purple-400/30 flex items-center gap-2.5 text-xs text-purple-300 animate-fadeIn">
+                <svg className="w-4 h-4 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Faculty Google connected ({prefillData.email}). Enter your password below.</span>
+              </div>
+            )}
+
+            {tRegError && (
+              <div className="mb-3 p-2.5 rounded-lg bg-rose-500/20 border border-rose-400/40 text-xs text-rose-300">
+                {tRegError}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <OutlinedField id="t-name" label="Full name" type="text" placeholder="Dr. Rajesh Kumar" value={fullName} onChange={(v) => { setFullName(v); setTRegError(''); }} />
+              <OutlinedField id="t-email" label="Faculty Email" type="text" placeholder="faculty@university.edu" value={email} onChange={(v) => { setEmail(v); setTRegError(''); }} />
+              <OutlinedField id="t-dept" label="Department / Subject" type="text" placeholder="Computer Science & Engineering" value={department} onChange={(v) => { setDepartment(v); setTRegError(''); }} />
+              <OutlinedField id="t-pass" label="Create Password" type="password" placeholder="••••••••" value={password} onChange={(v) => { setPassword(v); setTRegError(''); }} />
+
+              <p className="text-[11px] text-slate-400 leading-relaxed text-center px-1 pt-1">
+                By clicking &quot;Continue&quot;, you agree to our <a href="#" className="text-violet-400 hover:underline">Terms</a> and have read our <a href="#" className="text-violet-400 hover:underline">Privacy Policy</a>.
+              </p>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-full bg-white hover:bg-slate-200 text-black font-semibold text-sm transition-all duration-200 shadow-[0_6px_25px_rgba(255,255,255,0.25)] active:scale-[0.98]"
+              >
+                Continue
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center mt-6 mb-4">
+              <div className="w-full border-t border-white/10"></div>
+              <span className="absolute bg-[#111836]/80 backdrop-blur-md px-3 text-xs font-medium text-slate-300">
+                or register with
+              </span>
+            </div>
+
+            <GoogleButton label="Register with Google" onClick={() => onGoogleAuth && onGoogleAuth('teacher')} />
+          </div>
+        </section>
+      );
+    };
+
+    /* ════════════════════════════════════════
+       Component: Teacher Welcome Back Panel
+    ════════════════════════════════════════ */
+    const TeacherWelcomeBack = ({ onReturnToLogin }) => (
+      <section className="p-8 sm:p-10 lg:p-12 flex flex-col justify-center items-center text-center h-full w-full flex-1">
+        <div className="max-w-sm space-y-5">
+          <button
+            type="button"
+            onClick={onReturnToLogin}
+            className="w-14 h-14 rounded-[14px] border border-violet-400/40 flex items-center justify-center mx-auto transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: 'rgba(168, 85, 247, 0.12)',
+              boxShadow: '0 0 25px rgba(168, 85, 247, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <svg className="w-7 h-7 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            </svg>
+          </button>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">Join Faculty!</h2>
+          <p className="text-sm text-slate-300 font-normal leading-relaxed px-2">
+            Register your faculty account to access the teacher portal, create exams, and manage students.
+          </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={onReturnToLogin}
+              style={{
+                boxShadow: '0 10px 25px -5px rgba(168, 85, 247, 0.4), 0 0 20px rgba(168, 85, 247, 0.15)'
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-400 hover:to-purple-500 hover:shadow-[0_16px_36px_-4px_rgba(168,85,247,0.7),0_0_25px_rgba(168,85,247,0.35)] border border-violet-400/30 rounded-full text-white font-bold text-sm transition-all duration-200 active:scale-[0.98]"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Return to Login</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+
+    /* ════════════════════════════════════════
+       Main App — Florin Pop Double-Slider (C:/qwe/GPTK-QUIZ)
+    ════════════════════════════════════════ */
+    const App = () => {
+      const [isRegisterMode, setIsRegisterMode]         = useState(false);
+      const [registerType, setRegisterType]             = useState('student'); // 'student' | 'teacher'
+      const [googleModal, setGoogleModal]               = useState({ isOpen: false, role: 'student' });
+      const [prefillData, setPrefillData]               = useState(null);
+      const [registeredStudentId, setRegisteredStudentId] = useState('');
+      const [registeredTeacherId, setRegisteredTeacherId] = useState('');
+      const [studentNotice, setStudentNotice]           = useState('');
+      const [teacherNotice, setTeacherNotice]           = useState('');
+
+      // Google OAuth Cloud Client ID configuration
+      const [googleClientId, setGoogleClientId]         = useState(() => localStorage.getItem('google_client_id') || '');
+      const [showConfigModal, setShowConfigModal]       = useState(false);
+      const [clientIdInput, setClientIdInput]           = useState(googleClientId);
+
+      // Initialize Google Identity Services if Client ID is configured
+      useEffect(() => {
+        if (googleClientId && window.google?.accounts?.id) {
+          try {
+            window.google.accounts.id.initialize({
+              client_id: googleClientId,
+              callback: (response) => {
+                if (response.credential) {
+                  const payload = parseJwt(response.credential);
+                  if (payload) {
+                    handleGoogleAuthSuccess({
+                      name: payload.name || payload.email.split('@')[0],
+                      email: payload.email,
+                      role: registerType
+                    });
+                  }
+                }
+              },
+              auto_select: false,
+              cancel_on_tap_outside: true,
+            });
+          } catch (err) {
+            console.warn('GIS init error:', err);
+          }
+        }
+      }, [googleClientId, registerType]);
+
+      const handleOpenGoogle = (role) => {
+        // If real Google Client ID is configured and GIS is ready, trigger prompt
+        if (googleClientId && window.google?.accounts?.id) {
+          try {
+            window.google.accounts.id.prompt((notification) => {
+              if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                // Fallback to interactive modal
+                setGoogleModal({ isOpen: true, role });
+              }
+            });
+            return;
+          } catch (e) {
+            // Fallback
+          }
+        }
+        setGoogleModal({ isOpen: true, role });
+      };
+
+      const handleGoogleAuthSuccess = (userData) => {
+        setPrefillData(userData);
+        setRegisterType(userData.role);
+        setGoogleModal({ isOpen: false, role: userData.role });
+        // Automatically slide to registration view to fill remaining profile info!
+        setIsRegisterMode(true);
+      };
+
+      const handleStudentRegisterSuccess = ({ identifier, message }) => {
+        setRegisteredStudentId(identifier);
+        setStudentNotice(message);
+        setIsRegisterMode(false);
+      };
+
+      const handleTeacherRegisterSuccess = ({ identifier, message }) => {
+        setRegisteredTeacherId(identifier);
+        setTeacherNotice(message);
+        setIsRegisterMode(false);
+      };
+
+      const handleSaveClientId = (e) => {
+        e.preventDefault();
+        const trimmed = clientIdInput.trim();
+        setGoogleClientId(trimmed);
+        if (trimmed) {
+          localStorage.setItem('google_client_id', trimmed);
+        } else {
+          localStorage.removeItem('google_client_id');
+        }
+        setShowConfigModal(false);
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+          
+          {/* Top Bar: Google OAuth Configuration Pill */}
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              type="button"
+              onClick={() => { setClientIdInput(googleClientId); setShowConfigModal(true); }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/15 bg-slate-900/60 hover:bg-slate-800/80 backdrop-blur-md text-xs text-slate-300 hover:text-white transition-all shadow-md"
+            >
+              <svg className="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>{googleClientId ? 'Google OAuth: Live' : 'Google OAuth Settings'}</span>
+              <span className={`w-2 h-2 rounded-full ${googleClientId ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`}></span>
+            </button>
+          </div>
+
+          {/* Google Client ID Config Modal */}
+          {showConfigModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+              <div className="w-full max-w-md p-6 rounded-2xl bg-[#131314] border border-[#303134] text-white shadow-2xl space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#282a2d]">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                    </svg>
+                    <h3 className="text-base font-semibold text-white">Google OAuth 2.0 Client ID</h3>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowConfigModal(false)}
+                    className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveClientId} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Paste your Google Cloud OAuth Client ID:
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 1234567890-xxx.apps.googleusercontent.com"
+                      value={clientIdInput}
+                      onChange={(e) => setClientIdInput(e.target.value)}
+                      className="w-full py-2.5 px-3 bg-[#1e1f20] border border-[#3c4043] rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 font-mono"
+                    />
+                    <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                      Leave empty to use the built-in authentic OAuth modal simulation (with pre-filled accounts like Vasudevan and custom input).
+                    </p>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowConfigModal(false)}
+                      className="px-4 py-2 rounded-full border border-white/20 text-xs text-white hover:bg-white/10"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-full bg-white hover:bg-slate-200 text-black font-semibold text-xs shadow"
+                    >
+                      Save Configuration
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+          
+          {/* Google Auth Modal */}
+          <GoogleAuthModal
+            isOpen={googleModal.isOpen}
+            role={googleModal.role}
+            onClose={() => setGoogleModal({ isOpen: false, role: 'student' })}
+            onAuthSuccess={handleGoogleAuthSuccess}
+          />
+
+          <main className={`slider-main-container ${isRegisterMode ? 'right-panel-active' : ''}`}>
+            
+            {/* 1. STUDENT SIGN IN FORM (LEFT 50% BY DEFAULT) */}
+            <div className="form-container sign-in-container flex flex-col justify-between h-full bg-slate-900/35 overflow-y-auto">
+              <StudentLogin 
+                onSwitchToRegister={() => {
+                  setRegisterType('student');
+                  setIsRegisterMode(true);
+                }} 
+                onGoogleAuth={handleOpenGoogle}
+                registeredIdentifier={registeredStudentId}
+                loginNotification={studentNotice}
+              />
+            </div>
+
+            {/* 2. REGISTRATION FORM (SLIDES IN FROM RIGHT UNDER OVERLAY) */}
+            <div className="form-container sign-up-container flex flex-col justify-between h-full bg-[#111836]/35 overflow-y-auto">
+              {registerType === 'student' ? (
+                <StudentRegister 
+                  onRegisterSuccess={handleStudentRegisterSuccess}
+                  onGoogleAuth={handleOpenGoogle}
+                  prefillData={prefillData}
+                />
+              ) : (
+                <TeacherRegister 
+                  onRegisterSuccess={handleTeacherRegisterSuccess} 
+                  onGoogleAuth={handleOpenGoogle}
+                  prefillData={prefillData}
+                />
+              )}
+            </div>
+
+            {/* 3. SLIDING OVERLAY CONTAINER */}
+            <div className="overlay-container">
+              <div className="overlay">
+
+                {/* OVERLAY LEFT: Shown when Registration mode is active */}
+                <div className="overlay-panel overlay-left overflow-y-auto">
+                  {registerType === 'student' ? (
+                    <WelcomeBack onReturnToLogin={() => setIsRegisterMode(false)} />
+                  ) : (
+                    <TeacherWelcomeBack onReturnToLogin={() => setIsRegisterMode(false)} />
+                  )}
+                </div>
+
+                {/* OVERLAY RIGHT: Shown by default (Teacher Portal Part) */}
+                <div className="overlay-panel overlay-right overflow-y-auto">
+                  <LecturerLogin 
+                    onSwitchToTeacherRegister={() => {
+                      setRegisterType('teacher');
+                      setIsRegisterMode(true);
+                    }} 
+                    onGoogleAuth={handleOpenGoogle}
+                    registeredIdentifier={registeredTeacherId}
+                    loginNotification={teacherNotice}
+                  />
+                </div>
+
+              </div>
+            </div>
+
+          </main>
+
+          <footer className="mt-8 text-center text-xs font-medium text-gray-500 flex flex-wrap items-center justify-center gap-4">
+            <span>&copy; 2026 University Network</span>
+            <span>&bull;</span>
+            <a href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
+            <span>&bull;</span>
+            <a href="#" className="hover:text-gray-400 transition-colors">Terms of Service</a>
+            <span>&bull;</span>
+            <a href="#" className="hover:text-gray-400 transition-colors">Campus IT Help</a>
+          </footer>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
+
+
